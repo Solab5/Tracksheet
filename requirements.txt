@@ -1,5 +1,4 @@
 fastai
 streamlit
-openpyxl
 BytesIO
 os
