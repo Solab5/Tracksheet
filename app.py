@@ -10,10 +10,14 @@ def preprocess_data(data):
 def sample_data(data, num_samples, num_contractors):
     sampled_data = pd.DataFrame()
     for pre_village, data_group in data.groupby('pre_village'):
+        selected_indices = set()
         for contractor in range(1, num_contractors + 1):
-            num_samples_to_take = min(num_samples, len(data_group))
+            num_samples_to_take = min(num_samples, len(data_group) - len(selected_indices))
             if num_samples_to_take > 0:
-                sampled_rows = data_group.sample(n=num_samples_to_take)
+                remaining_indices = set(data_group.index) - selected_indices
+                sampled_indices = data_group.loc[list(remaining_indices)].sample(n=num_samples_to_take).index
+                selected_indices.update(sampled_indices)
+                sampled_rows = data_group.loc[sampled_indices]
                 sampled_rows['contractor'] = contractor
                 sampled_data = pd.concat([sampled_data, sampled_rows])
     return sampled_data.reset_index(drop=True)
